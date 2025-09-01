@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    Home
+{% endblock %}
+
+{% block content %}
+    <div class="home-container">
+        <section class="side-bar">
+            <span class="material-symbols-outlined">account_box</span>
+            <hr style="width: 100%; color: #000;">
+            <div class="side-bar-options">
+                <ul>
+                    <li><a href="">Nova Tarefa</a></li>
+                    <li><a href="">Dashboard</a></li>
+                    <li><a href="">Deslogar</a></li>
+                </ul>
+            </div>
+        </section>
+        <main class="main-content">
+            {% if user_tasks %}
+                {% for task in user_tasks %}
+                    <div class="task-card">
+
+                    </div>
+                {% endfor %}
+            {% else %}
+                <h1>Nenhuma tarefa assignada ao usuario logado</h1>
+            {% endif %}
+        </main>
+    </div>
+{% endblock %}
