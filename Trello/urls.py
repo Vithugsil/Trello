@@ -24,4 +24,7 @@ urlpatterns = [
     path('login/', login, name='login'),
     path('signup/', signup, name='signup'),
     path('admin/', admin.site.urls),
+    path('logout/', logout, name='logout'),
+    path('newtask/', newTask, name='newtask'),
+    path('deletetask/<int:task_id>/', deleteTask, name='deletetask'),
 ]
