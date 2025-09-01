@@ -63,10 +63,11 @@
         width: 90%;
         height: 100%;
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         justify-content: center;
         padding: 2rem;
         overflow-y: auto;
+        overflow-x: hidden;
     }
 
     /* Container grid para as tasks */
@@ -76,7 +77,8 @@
         gap: 1.5rem;
         width: 100%;
         max-width: 1200px;
-        padding: 1rem;
+        padding: 1rem 1rem 2rem 1rem;
+        min-height: fit-content;
     }
 
     /* Responsividade do grid */
@@ -158,6 +160,11 @@
         text-align: center;
         color: #666;
         font-size: 1.2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        width: 100%;
     }
 
     .side-bar {
