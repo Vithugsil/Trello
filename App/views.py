@@ -12,7 +12,7 @@ def home(request):
     print("User is logged in with user_id:", request.session['user_id'])
 
     # verificar o poprque nao ta filtrando
-    Status_id = request.POST.get('status', 0)
+    Status_id = str(request.GET.get('Status_id', '0'))
 
     print("Filtering tasks with Status_id:", Status_id)
 
@@ -21,7 +21,7 @@ def home(request):
     if Status_id != "0":
         tasks = Task.objects.filter(user=user, status__id=Status_id).all()
     else:
-        tasks = Task.objects.filter(user=user).all()
+        tasks = Task.objects.filter(user=user)
     
     task_status = Status.objects.all()
 
