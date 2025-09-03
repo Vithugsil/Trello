@@ -11,8 +11,7 @@ def home(request):
     
     print("User is logged in with user_id:", request.session['user_id'])
 
-    # verificar o poprque nao ta filtrando
-    Status_id = str(request.GET.get('Status_id', '0'))
+    Status_id = str(request.POST.get('status', '0'))
 
     print("Filtering tasks with Status_id:", Status_id)
 
