@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Home
+{% endblock %}
+
+{% block content %}
+    <div class="home-container">
+        <section class="side-bar">
+            <span class="material-symbols-outlined">account_box</span>
+            <div class="side-bar-options">
+                <ul>
+                    <li><a href="{% url 'newtask' %}" class="option">Nova Tarefa</a></li>
+                    <li><a href="{% url 'dashboard' %}" class="option">Dashboard</a></li>
+                    <li><a href="{% url 'logout' %}" class="option">Deslogar</a></li>
+                </ul>
+            </div>
+            <form action="{% url 'home' %}" method="post" class="filter-form">
+                {% csrf_token %}
+                <label for="status">Filtrar por status:</label>
+                <select name="status" id="status">
+                    <option value=0 selected>Sem filtro</option>
+                    {% for status in task_status %}
+                        <option value="{{ status.id }}">{{ status.name }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit">Filtrar</button>
+            </form>
+        </section>
+        <main class="main-content">
+            <div style="width: 100%; text-align: center; margin-bottom: 1rem;">
+                <h1>Minhas Tarefas</h1>
+            </div>
+            {% if user_tasks %}
+                <div class="tasks-grid">
+                    {% for task in user_tasks %}
+                        <div class="task-card">
+                            <h2>{{ task.title }}</h2>
+                            <div class="task-details">
+                                <p>Status:</p>
+                                <P>{{ task.status.name }}</P>
+                                <p>Description:</p>
+                                <P>{{ task.description }}</P>
+                                <div class="buttons">
+                                    <a href="{% url 'deletetask' task.id %}" style="text-decoration: none;">❌</a>
+                                    <a href="{% url 'edittask' task.id %}" style="text-decoration: none;">✏️</a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="no-tasks">
+                    <h1>Nenhuma tarefa assignada ao usuario logado</h1>
+                </div>
+            {% endif %}
+        </main>
+    </div>
+{% endblock %}
