@@ -29,6 +29,7 @@ python manage.py migrate
 
 ### 3. Configure os dados iniciais (Status, usuários e tarefas de exemplo)
 ```bash
+cd App\commands
 python manage.py setup_initial_data
 ```
 
