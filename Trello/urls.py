@@ -26,6 +26,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('logout/', logout, name='logout'),
     path('newtask/', newTask, name='newtask'),
+    path('dashboard/', dashboard, name='dashboard'),
     path('deletetask/<int:task_id>/', deleteTask, name='deletetask'),
     path('edittask/<int:task_id>/', editTask, name='edittask'),
 ]

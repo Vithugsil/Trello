@@ -1,0 +1,289 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Dashboard - Trello System
+{% endblock %}
+
+{% block content %}
+    <div class="home-container">
+        <section class="side-bar">
+            <span class="material-symbols-outlined">account_box</span>
+            <div class="side-bar-options">
+                <ul>
+                    <li><a href="{% url 'home' %}" class="option">Minhas Tarefas</a></li>
+                    <li><a href="{% url 'newtask' %}" class="option">Nova Tarefa</a></li>
+                    <li><a href="{% url 'logout' %}" class="option">Deslogar</a></li>
+                </ul>
+            </div>
+            <form action="{% url 'dashboard' %}" method="post" class="filter-form">
+                {% csrf_token %}
+                <label for="status">Filtrar por status:</label>
+                <select name="status" id="status">
+                    <option value="0" {% if selected_status == '0' %}selected{% endif %}>Todos os status</option>
+                    {% for status in all_status %}
+                        <option value="{{ status.id }}" {% if selected_status == status.id|stringformat:'s' %}selected{% endif %}>
+                            {{ status.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+                
+                <label for="user">Filtrar por usuário:</label>
+                <select name="user" id="user">
+                    <option value="0" {% if selected_user == '0' %}selected{% endif %}>Todos os usuários</option>
+                    {% for user in all_users %}
+                        <option value="{{ user.id }}" {% if selected_user == user.id|stringformat:'s' %}selected{% endif %}>
+                            {{ user.username }}
+                        </option>
+                    {% endfor %}
+                </select>
+                
+                <button type="submit">Filtrar</button>
+            </form>
+        </section>
+        
+        <main class="main-content">
+            <div class="dashboard-container">
+                <h1>Dashboard Geral do Sistema</h1>
+                
+                <!-- Estatísticas Gerais -->
+                <div class="stats-section">
+                    <h2>Estatísticas Gerais</h2>
+                    <div class="stats-cards">
+                        <div class="stat-card">
+                            <h3>{{ total_tasks }}</h3>
+                            <p>Total de Tarefas</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>{{ total_users }}</h3>
+                            <p>Total de Usuários</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>{{ all_tasks.count }}</h3>
+                            <p>Tarefas Filtradas</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Estatísticas por Status -->
+                <div class="stats-section">
+                    <h2>Tarefas por Status</h2>
+                    <div class="status-stats">
+                        {% for stat in status_stats %}
+                            <div class="status-stat-item">
+                                <span class="status-name">{{ stat.status__name }}</span>
+                                <span class="status-count">{{ stat.count }} tarefa{{ stat.count|pluralize }}</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Estatísticas por Usuário -->
+                <div class="stats-section">
+                    <h2>Tarefas por Usuário</h2>
+                    <div class="user-stats">
+                        {% for stat in user_stats %}
+                            <div class="user-stat-item">
+                                <span class="user-name">{{ stat.user__username }}</span>
+                                <span class="user-count">{{ stat.count }} tarefa{{ stat.count|pluralize }}</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Lista de Todas as Tarefas -->
+                <div class="all-tasks-section">
+                    <h2>
+                        {% if selected_status != '0' or selected_user != '0' %}
+                            Tarefas Filtradas
+                        {% else %}
+                            Todas as Tarefas do Sistema
+                        {% endif %}
+                    </h2>
+                    
+                    {% if all_tasks %}
+                        <div class="tasks-grid">
+                            {% for task in all_tasks %}
+                                <div class="task-card {% if task.user.id == current_user.id %}my-task{% endif %}">
+                                    <h3>{{ task.title }}</h3>
+                                    <div class="task-details">
+                                        <p><strong>Status:</strong></p>
+                                        <p class="status-badge status-{{ task.status.name|lower }}">{{ task.status.name }}</p>
+                                        
+                                        <p><strong>Atribuído a:</strong></p>
+                                        <p class="assigned-user {% if task.user.id == current_user.id %}current-user{% endif %}">
+                                            {{ task.user.username }}
+                                            {% if task.user.id == current_user.id %}(Você){% endif %}
+                                        </p>
+                                        
+                                        <p><strong>Descrição:</strong></p>
+                                        <p class="task-description">{{ task.description|truncatewords:20 }}</p>
+                                        
+                                        {% if task.user.id == current_user.id %}
+                                            <div class="buttons">
+                                                <a href="{% url 'deletetask' task.id %}" style="text-decoration: none;">❌</a>
+                                                <a href="{% url 'edittask' task.id %}" style="text-decoration: none;">✏️</a>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="no-tasks">
+                            <h3>Nenhuma tarefa encontrada com os filtros aplicados</h3>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <style>
+        .dashboard-container {
+            width: 100%;
+            padding: 2rem;
+        }
+
+        .dashboard-container h1 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #333;
+        }
+
+        .stats-section {
+            margin-bottom: 2rem;
+            background-color: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .stats-section h2 {
+            margin-bottom: 1rem;
+            color: #495057;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 0.5rem;
+        }
+
+        .stats-cards {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .stat-card {
+            background-color: #007bff;
+            color: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            min-width: 150px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .stat-card h3 {
+            font-size: 2rem;
+            margin: 0;
+            font-weight: bold;
+        }
+
+        .stat-card p {
+            margin: 0.5rem 0 0 0;
+            font-size: 0.9rem;
+        }
+
+        .status-stats, .user-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .status-stat-item, .user-stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: white;
+            padding: 1rem;
+            border-radius: 6px;
+            border-left: 4px solid #28a745;
+        }
+
+        .user-stat-item {
+            border-left-color: #ffc107;
+        }
+
+        .status-name, .user-name {
+            font-weight: bold;
+            color: #495057;
+        }
+
+        .status-count, .user-count {
+            background-color: #e9ecef;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .all-tasks-section {
+            margin-top: 2rem;
+        }
+
+        .all-tasks-section h2 {
+            color: #495057;
+            border-bottom: 2px solid #28a745;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .task-card.my-task {
+            border: 2px solid #007bff;
+            background-color: #e7f3ff;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .status-pendente {
+            background-color: #ffc107;
+            color: #212529;
+        }
+
+        .status-em-andamento {
+            background-color: #17a2b8;
+            color: white;
+        }
+
+        .status-concluída, .status-concluida {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .assigned-user.current-user {
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        .task-description {
+            font-style: italic;
+            color: #6c757d;
+            line-height: 1.4;
+        }
+
+        @media (max-width: 768px) {
+            .stats-cards {
+                flex-direction: column;
+            }
+            
+            .stat-card {
+                min-width: auto;
+            }
+        }
+    </style>
+{% endblock %}

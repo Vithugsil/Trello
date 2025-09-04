@@ -1,4 +1,5 @@
 from django.shortcuts import redirect, render
+from django.db.models import Count
 from .models import *
 
 # Create your views here.
@@ -31,6 +32,56 @@ def home(request):
     }
 
     return render(request, 'home.html', context)
+
+def dashboard(request):
+    if 'user_id' not in request.session:
+        print("User not logged in, redirecting to login page")
+        return redirect('login')
+    
+    # Filtros do dashboard
+    status_filter = request.POST.get('status', '0') if request.method == 'POST' else '0'
+    user_filter = request.POST.get('user', '0') if request.method == 'POST' else '0'
+    
+    # Buscar todas as tarefas com filtros aplicados
+    all_tasks = Task.objects.all()
+    
+    if status_filter != '0':
+        all_tasks = all_tasks.filter(status__id=status_filter)
+    
+    if user_filter != '0':
+        all_tasks = all_tasks.filter(user__id=user_filter)
+    
+    # Estatísticas gerais
+    total_tasks = Task.objects.count()
+    total_users = User.objects.count()
+    
+    # Estatísticas por status
+    status_stats = Task.objects.values('status__name').annotate(count=Count('id')).order_by('status__name')
+    
+    # Estatísticas por usuário
+    user_stats = Task.objects.values('user__username').annotate(count=Count('id')).order_by('-count')
+    
+    # Buscar todos os status e usuários para os filtros
+    all_status = Status.objects.all()
+    all_users = User.objects.all()
+    
+    # Usuario logado atual
+    current_user = User.objects.get(id=request.session['user_id'])
+    
+    context = {
+        'all_tasks': all_tasks,
+        'total_tasks': total_tasks,
+        'total_users': total_users,
+        'status_stats': status_stats,
+        'user_stats': user_stats,
+        'all_status': all_status,
+        'all_users': all_users,
+        'current_user': current_user,
+        'selected_status': status_filter,
+        'selected_user': user_filter,
+    }
+    
+    return render(request, 'dashboard.html', context)
 
 def signup(request):
 
