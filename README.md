@@ -16,7 +16,7 @@ cd caminho/para/pasta/Trello
 ```bash
 python manage.py runserver
 ```
-Após executar e verificar que o arquivo **db.sqlite3** foi criado, cancele a execução do programa com <kbd>CTRL</kbd>+<kbd>C</kbd> siga para o próximo passo.
+Após executar e verificar que o arquivo **db.sqlite3** foi criado, cancele a execução do programa com <kbd>CTRL</kbd>+<kbd>C</kbd> e siga para o próximo passo.
 
 ### 3. Aplique as migrações do banco de dados
 ```bash
