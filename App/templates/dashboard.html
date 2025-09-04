@@ -123,6 +123,11 @@
                                                 <a href="{% url 'deletetask' task.id %}" style="text-decoration: none;">❌</a>
                                                 <a href="{% url 'edittask' task.id %}" style="text-decoration: none;">✏️</a>
                                             </div>
+                                        {% else %}
+                                            <div class="buttons">
+                                                <span style="opacity: 0.3; cursor: not-allowed;">❌</span>
+                                                <span style="opacity: 0.3; cursor: not-allowed;">✏️</span>
+                                            </div>
                                         {% endif %}
                                     </div>
                                 </div>
